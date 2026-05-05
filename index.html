@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>calTax - Nigerian Tax Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <i data-lucide="calculator"></i>
+                <span>calTax</span>
+            </div>
+            <nav>
+                <a href="#calculator" class="active">Calculator</a>
+                <a href="#parser">Statement Parser</a>
+                <a href="#calendar">Tax Calendar</a>
+                <a href="#notifications-section">Notifications</a>
+                <a href="#history-section">History</a>
+                <a href="#resources">Resources</a>
+            </nav>
+            <div class="header-actions">
+                <span id="user-info" style="display: none; margin-right: 1rem; font-size: 0.9rem;">Welcome, <span id="user-name"></span></span>
+                <button class="btn btn-secondary" id="logout-btn" style="display: none;" onclick="logout()">Logout</button>
+                <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">
+                    <i data-lucide="moon"></i>
+                </button>
+                <button class="btn btn-secondary" onclick="showHelp()">
+                    <i data-lucide="help-circle"></i>
+                    Help
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- Hero Section -->
+            <section class="hero">
+                <h1>Nigerian Tax Calculator</h1>
+                <p>Calculate your tax liability accurately based on the Nigerian Tax Act 2025. Parse statements, track deductions, and generate professional reports.</p>
+            </section>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" data-tab="personal">Personal Tax</button>
+                <button class="tab" data-tab="corporate">Corporate Tax</button>
+                <button class="tab" data-tab="vat">VAT Calculator</button>
+                <button class="tab" data-tab="withholding">Withholding Tax</button>
+            </div>
+
+            <!-- Personal Tax Calculator -->
+            <section class="calculator-section active" id="personal-section">
+                <div class="calculator-grid">
+                    <div class="card">
+                        <h3><i data-lucide="briefcase"></i> Income Details</h3>
+                        <div class="form-group">
+                            <label>Annual Basic Salary</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">₦</span>
+                                <input type="number" id="basicSalary" class="has-prefix" placeholder="0.00">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Housing Allowance</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">₦</span>
+                                <input type="number" id="housingAllowance" class="has-prefix" placeholder="0.00" value="0">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Transport Allowance</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">₦</span>
+                                <input type="number" id="transportAllowance" class="has-prefix" placeholder="0.00" value="0">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Other Allowances</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">₦</span>
+                                <input type="number" id="otherAllowances" class="has-prefix" placeholder="0.00" value="0">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Bonus / Incentives</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">₦</span>
+                                <input type="number" id="bonus" class="has-prefix" placeholder="0.00" value="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i data-lucide="settings"></i> Deductions</h3>
+                        <div class="form-group">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="autoDeductions" checked>
+                                <label for="autoDeductions">Auto-calculate standard deductions</label>
+                            </div>
+                            <p class="helper-text">Consolidated Relief Allowance, NHF, NSITF, Pension</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Pension Contribution (%)</label>
+                            <input type="number" id="pensionPercent" value="8.33" step="0.01" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label>Life Insurance Premium</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">₦</span>
+                                <input type="number" id="lifeInsurance" class="has-prefix" placeholder="0.00" value="0">
+                            </div>
+                            <p class="helper-text">Maximum ₦50,000 deductible</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Professional Subscription</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">₦</span>
+                                <input type="number" id="professionalSub" class="has-prefix" placeholder="0.00" value="0">
+                            </div>
+                            <p class="helper-text">Maximum ₦10,000 (CIMA, ICAN, etc.)</p>
+                        </div>
+                        <button class="btn btn-primary btn-full" onclick="calculatePersonalTax()">
+                            <i data-lucide="calculator"></i> Calculate Tax
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div class="results-section" id="personal-results">
+                    <div class="results-grid">
+                        <div class="result-card highlight">
+                            <h4>Total Tax Payable</h4>
+                            <div class="amount mono" id="personal-total-tax">₦0.00</div>
+                        </div>
+                        <div class="result-card">
+                            <h4>Taxable Income</h4>
+                            <div class="amount mono" id="personal-taxable-income">₦0.00</div>
+                        </div>
+                        <div class="result-card">
+                            <h4>Effective Rate</h4>
+                            <div class="amount mono" id="personal-effective-rate">0%</div>
+                        </div>
+                        <div class="result-card">
+                            <h4>Monthly Tax</h4>
+                            <div class="amount mono" id="personal-monthly-tax">₦0.00</div>
+                        </div>
+                    </div>
+
+                    <div class="breakdown">
+                        <h3>Tax Breakdown</h3>
+                        <div id="personal-breakdown"></div>
+                        <div class="export-buttons">
+                            <button class="btn btn-primary" onclick="exportPersonalPDF()">
+                                <i data-lucide="download"></i> Export PDF
+                            </button>
+                            <button class="btn btn-secondary" onclick="showBracketChart('personal')">
+                                <i data-lucide="bar-chart-2"></i> View Chart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Corporate Tax Calculator -->
+            <section class="calculator-section" id="corporate-section">
+                <div class="calculator-grid">
+                    <div class="card">
+                        <h3><i data-lucide="building-2"></i> Company Details</h3>
+                        <div class="form-group">
+                            <label>Company Type</label>
+                            <select id="companyType">
+                                <option value="large">Large Company (> ₦100M)</option>
+                                <option value="medium">Medium Company (₦25M - ₦100M)</option>
+                                <option value="small">Small Company (< ₦25M)</option>
+                                <option value="bank">Bank / Financial Institution</option>
+                                <option value="insurance">Insurance Company</option>
+                                <option value="telecom">Telecommunication</option>
+                                <option value="oil">Oil & Gas (Deep Offshore)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Gross Revenue</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">₦</span>
+                                <input type="number" id="corpGrossRevenue" class="has-prefix" placeholder="0.00">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Cost of Sales</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">₦</span>
+                                <input type="number" id="corpCostOfSales" class="has-prefix" placeholder="0.00" value="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i data-lucide="trending-down"></i> Expenses & Allowances</h3>
+                        <div class="form-group">
+                            <label>Operating Expenses</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">₦</span>
+                                <input type="number" id="corpOperatingExp" class="has-prefix" placeholder="0.00" value="0">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Capital Allowances - Initial (%)</label>
+                            <input type="number" id="corpInitialAllowance" value="50" max="100">
+                            <p class="helper-text">Initial allowance: 50% standard</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Capital Allowances - Annual (%)</label>
+                            <input type="number" id="corpAnnualAllowance" value="25" max="100">
+                            <p class="helper-text">Annual allowance: 25% standard</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Investment Allowance (%)</label>
+                            <input type="number" id="corpInvestmentAllowance" value="10" max="100">
+                        </div>
+                        <button class="btn btn-primary btn-full" onclick="calculateCorporateTax()">
+                            <i data-lucide="calculator"></i> Calculate Tax
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div class="results-section" id="corporate-results">
+                    <div class="results-grid">
+                        <div class="result-card highlight">
+                            <h4>Total Tax Payable</h4>
+                            <div class="amount mono" id="corp-total-tax">₦0.00</div>
+                        </div>
+                        <div class="result-card">
+                            <h4>Taxable Income</h4>
+                            <div class="amount mono" id="corp-taxable-income">₦0.00</div>
+                        </div>
+                        <div class="result-card">
+                            <h4>Tax Rate</h4>
+                            <div class="amount mono" id="corp-tax-rate">0%</div>
+                        </div>
+                        <div class="result-card">
+                            <h4>Capital Allowances</h4>
+                            <div class="amount mono" id="corp-capital-allowances">₦0.00</div>
+                        </div>
+                    </div>
+
+                    <div class="breakdown">
+                        <h3>Corporate Tax Breakdown</h3>
+                        <div id="corporate-breakdown"></div>
+                        <div class="export-buttons">
+                            <button class="btn btn-primary" onclick="exportCorporatePDF()">
+                                <i data-lucide="download"></i> Export PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VAT Calculator -->
+            <section class="calculator-section" id="vat-section">
+                <div class="calculator-grid">
+                    <div class="card">
+                        <h3><i data-lucide="receipt"></i> VAT Details</h3>
+                        <div class="form-group">
+                            <label>Gross Sales (VAT Inclusive)</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">₦</span>
+                                <input type="number" id="vatGrossSales" class="has-prefix" placeholder="0.00">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>VAT-Exempt Sales</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">₦</span>
+                                <input type="number" id="vatExemptSales" class="has-prefix" placeholder="0.00" value="0">
+                            </div>
+                            <p class="helper-text">Zero-rated and exempt supplies</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Input VAT (Creditable)</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">₦</span>
+                                <input type="number" id="vatInput" class="has-prefix" placeholder="0.00" value="0">
+                            </div>
+                            <p class="helper-text">VAT on purchases/expenses</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Reverse Charge VAT</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">₦</span>
+                                <input type="number" id="vatReverseCharge" class="has-prefix" placeholder="0.00" value="0">
+                            </div>
+                            <p class="helper-text">VAT on imported services</p>
+                        </div>
+                        <button class="btn btn-primary btn-full" onclick="calculateVAT()">
+                            <i data-lucide="calculator"></i> Calculate VAT
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <h3><i data-lucide="info"></i> VAT Information</h3>
+                        <div class="breakdown-item">
+                            <span class="label">Standard VAT Rate</span>
+                            <span class="value">7.5%</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="label">Registration Threshold</span>
+                            <span class="value">₦25,000,000</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="label">Filing Frequency</span>
+                            <span class="value">Monthly</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="label">Due Date</span>
+                            <span class="value">21st of following month</span>
+                        </div>
+                        <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,143,0,0.1); border-radius: var(--radius-sm);">
+                            <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                                <strong>Note:</strong> Zero-rated items (0%) include essential food items, medical supplies, etc. Exempt items include financial services, education, and residential rent.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div class="results-section" id="vat-results">
+                    <div class="results-grid">
+                        <div class="result-card highlight">
+                            <h4>VAT Payable</h4>
+                            <div class="amount mono" id="vat-payable">₦0.00</div>
+                        </div>
+                        <div class="result-card">
+                            <h4>Output VAT</h4>
+                            <div class="amount mono" id="vat-output">₦0.00</div>
+                        </div>
+                        <div class="result-card">
+                            <h4>Input VAT</h4>
+                            <div class="amount mono" id="vat-input-credit">₦0.00</div>
+                        </div>
+                        <div class="result-card">
+                            <h4>Net VAT Position</h4>
+                            <div class="amount mono" id="vat-net">₦0.00</div>
+                        </div>
+                    </div>
+
+                    <div class="breakdown">
+                        <h3>VAT Breakdown</h3>
+                        <div id="vat-breakdown"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Withholding Tax Calculator -->
+            <section class="calculator-section" id="withholding-section">
+                <div class="calculator-grid">
+                    <div class="card">
+                        <h3><i data-lucide="percent"></i> Payment Details</h3>
+                        <div class="form-group">
+                            <label>Payment Type</label>
+                            <select id="whtPaymentType">
+                                <option value="dividend">Dividend</option>
+                                <option value="interest">Interest</option>
+                                <option value="royalty">Royalties</option>
+                                <option value="technical">Technical Service Fees</option>
+                                <option value="consultancy">Consultancy Fees</option>
+                                <option value="rental">Rental</option>
+                                <option value="commission">Commission</option>
+                                <option value="director">Directors' Fees</option>
+                                <option value="contract">Contract Payment</option>
+                                <option value="construction">Construction</option>
+                                <option value="supply">Supply of Goods</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Gross Amount</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">₦</span>
+                                <input type="number" id="whtGrossAmount" class="has-prefix" placeholder="0.00">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Recipient Type</label>
+                            <select id="whtRecipientType">
+                                <option value="individual">Individual</option>
+                                <option value="company">Company</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="whtTreaty">
+                                <label for="whtTreaty">Apply Tax Treaty Benefits</label>
+                            </div>
+                            <p class="helper-text">Reduce rate if treaty exists with recipient's country</p>
+                        </div>
+                        <button class="btn btn-primary btn-full" onclick="calculateWHT()">
+                            <i data-lucide="calculator"></i> Calculate WHT
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <h3><i data-lucide="list"></i> WHT Rates Reference</h3>
+                        <div class="breakdown-item">
+                            <span class="label">Dividends, Interest, Royalties</span>
+                            <span class="value">10%</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="label">Technical, Consultancy, Rental</span>
+                            <span class="value">10%</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="label">Commission, Director Fees</span>
+                            <span class="value">10%</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="label">Contract Payments</span>
+                            <span class="value">5%</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="label">Construction</span>
+                            <span class="value">5%</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="label">Supply of Goods</span>
+                            <span class="value">2%</span>
+                        </div>
+                        <div style="margin-top: 1rem; padding: 1rem; background: rgba(16,185,129,0.1); border-radius: var(--radius-sm);">
+                            <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                                <strong>Note:</strong> Companies receiving payments are subject to different rates. Tax treaties may reduce these rates. Ensure TIN verification for recipients.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div class="results-section" id="wht-results">
+                    <div class="results-grid">
+                        <div class="result-card highlight">
+                            <h4>WHT Deducted</h4>
+                            <div class="amount mono" id="wht-deducted">₦0.00</div>
+                        </div>
+                        <div class="result-card">
+                            <h4>Net Payment</h4>
+                            <div class="amount mono" id="wht-net">₦0.00</div>
+                        </div>
+                        <div class="result-card">
+                            <h4>WHT Rate Applied</h4>
+                            <div class="amount mono" id="wht-rate">0%</div>
+                        </div>
+                    </div>
+
+                    <div class="breakdown">
+                        <h3>Withholding Tax Breakdown</h3>
+                        <div id="wht-breakdown"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Statement Parser Section -->
+            <section class="parser-section" id="parser-section">
+                <h2 style="margin-bottom: 1.5rem;">Statement of Account Parser</h2>
+                <div class="upload-zone" id="uploadZone">
+                    <i data-lucide="upload" size="48"></i>
+                    <h4>Drag & drop your statement here</h4>
+                    <p>or click to browse files</p>
+                    <div class="file-types">
+                        <span class="file-type-badge">CSV</span>
+                        <span class="file-type-badge">Excel</span>
+                        <span class="file-type-badge">PDF</span>
+                    </div>
+                </div>
+                <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.pdf">
+
+                <div class="parsed-data" id="parsedData">
+                    <h3 style="margin-bottom: 1rem;">Parsed Transactions</h3>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table" id="transactionsTable">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Amount (₦)</th>
+                                    <th>Category</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionsBody">
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 style="margin: 2rem 0 1rem;">Expense Summary</h3>
+                    <div class="expense-summary" id="expenseSummary">
+                    </div>
+
+                    <div class="export-buttons" style="margin-top: 2rem;">
+                        <button class="btn btn-primary" onclick="exportExpenses()">
+                            <i data-lucide="download"></i> Export to Excel
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportExpensePDF()">
+                            <i data-lucide="file-text"></i> Export PDF Report
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tax Calendar Section -->
+            <section class="calendar-section" id="calendar-section" style="margin-top: 3rem;">
+                <h2 style="margin-bottom: 1.5rem;">Tax Calendar</h2>
+                <div class="card">
+                    <div class="calendar-header">
+                        <h3 id="calendarMonth">April 2026</h3>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-secondary" onclick="changeMonth(-1)">
+                                <i data-lucide="chevron-left"></i>
+                            </button>
+                            <button class="btn btn-secondary" onclick="changeMonth(1)">
+                                <i data-lucide="chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid">
+                    </div>
+                    <div class="calendar-events" id="calendarEvents">
+                    </div>
+                    <button class="btn btn-primary" style="margin-top: 1rem;" onclick="addTaxEvent()">
+                        <i data-lucide="plus"></i> Add Tax Deadline
+                    </button>
+                </div>
+            </section>
+
+            <!-- Resources Section -->
+            <section id="resources-section" style="margin-top: 3rem;">
+                <h2 style="margin-bottom: 1.5rem;">Tax Resources</h2>
+                <div class="calculator-grid">
+                    <div class="card">
+                        <h3><i data-lucide="book-open"></i> Tax Tips</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 0.75rem 0; border-bottom: 1px solid var(--border-light);">
+                                <strong>Keep records:</strong> Maintain all income and expense records for at least 6 years.
+                            </li>
+                            <li style="padding: 0.75rem 0; border-bottom: 1px solid var(--border-light);">
+                                <strong>File on time:</strong> Submit returns by the due date to avoid penalties.
+                            </li>
+                            <li style="padding: 0.75rem 0; border-bottom: 1px solid var(--border-light);">
+                                <strong>Claim all deductions:</strong> Ensure you're maximizing legitimate deductions.
+                            </li>
+                            <li style="padding: 0.75rem 0;">
+                                <strong>Update TIN:</strong> Keep your Tax Identification Number current.
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3><i data-lucide="alert-circle"></i> Important Deadlines</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 0.75rem 0; border-bottom: 1px solid var(--border-light);">
+                                <strong>PAYE:</strong> 10th of following month
+                            </li>
+                            <li style="padding: 0.75rem 0; border-bottom: 1px solid var(--border-light);">
+                                <strong>VAT:</strong> 21st of following month
+                            </li>
+                            <li style="padding: 0.75rem 0; border-bottom: 1px solid var(--border-light);">
+                                <strong>Withholding Tax:</strong> 15th of following month
+                            </li>
+                            <li style="padding: 0.75rem 0;">
+                                <strong>Annual Returns:</strong> 31st March each year
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3><i data-lucide="help-circle"></i> FAQ</h3>
+                        <div class="accordion">
+                            <div class="accordion-item">
+                                <div class="accordion-header" onclick="toggleAccordion(this)">
+                                    <span>What is Consolidated Relief Allowance?</span>
+                                    <i data-lucide="chevron-down"></i>
+                                </div>
+                                <div class="accordion-content">
+                                    <div class="accordion-content-inner">
+                                        CRA is 20% of gross income or ₦200,000, whichever is higher. It provides automatic relief for all taxpayers.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <div class="accordion-header" onclick="toggleAccordion(this)">
+                                    <span>When do I need to register for VAT?</span>
+                                    <i data-lucide="chevron-down"></i>
+                                </div>
+                                <div class="accordion-content">
+                                    <div class="accordion-content-inner">
+                                        You must register for VAT if your annual turnover exceeds ₦25 million. Registration should be done within 6 months of reaching this threshold.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <div class="accordion-header" onclick="toggleAccordion(this)">
+                                    <span>What is the penalty for late filing?</span>
+                                    <i data-lucide="chevron-down"></i>
+                                </div>
+                                <div class="accordion-content">
+                                    <div class="accordion-content-inner">
+                                        Penalties vary by tax type but can include fines, interest on unpaid tax, and potential criminal liability for willful evasion.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Notifications Section -->
+            <section id="notifications-section" style="margin-top: 3rem;">
+                <h2 style="margin-bottom: 1.5rem;"><i data-lucide="bell"></i> Tax Notifications</h2>
+                <div class="calculator-grid">
+                    <div class="card">
+                        <h3><i data-lucide="plus-circle"></i> Set Reminder</h3>
+                        <div class="form-group">
+                            <label>Notification Title</label>
+                            <input type="text" id="notifTitle" placeholder="e.g., PAYE Filing Deadline">
+                        </div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="notifDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Email (optional - for MantaHQ reminders)</label>
+                            <input type="email" id="notifEmail" placeholder="your@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Remind Me</label>
+                            <select id="notifRemind">
+                                <option value="0">On the day</option>
+                                <option value="1">1 day before</option>
+                                <option value="3">3 days before</option>
+                                <option value="7">1 week before</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary btn-full" id="notif-submit-btn" onclick="addNotification()">
+                            <i data-lucide="bell"></i> Set Reminder
+                        </button>
+                    </div>
+                    <div class="card">
+                        <h3><i data-lucide="bell-ring"></i> Active Notifications</h3>
+                        <div id="notificationsList" style="max-height: 300px; overflow-y: auto;">
+                            <p style="color: var(--text-secondary); font-size: 0.875rem;">No notifications set</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Calculation History Section -->
+            <section id="history-section" style="margin-top: 3rem;">
+                <h2 style="margin-bottom: 1.5rem;"><i data-lucide="history"></i> Calculation History</h2>
+                <div class="card">
+                    <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                        Your tax calculations are automatically saved to MantaHQ Data Tables.
+                    </p>
+                    <div id="calc-history-list">
+                        <p style="color: var(--text-secondary); font-size: 0.875rem;">Loading history…</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p><strong>Disclaimer:</strong> This calculator provides estimates based on the Nigerian Tax Act 2025. For official tax computations, consult a qualified tax professional or the Nigeria Revenue Service.</p>
+        <p style="margin-top: 0.5rem;">© 2026 calTax - Nigerian Tax Calculator. All rights reserved.</p>
+    </footer>
+
+    <!-- Help Modal -->
+    <div class="modal-overlay" id="helpModal">
+        <div class="modal">
+            <h3>How to Use calTax</h3>
+            <div style="margin-top: 1rem;">
+                <p><strong>1. Personal Tax:</strong> Enter your annual income details and deductions. The calculator applies 2025 tax brackets automatically.</p>
+                <p style="margin-top: 0.75rem;"><strong>2. Corporate Tax:</strong> Select your company type and enter revenue/expenses. Capital allowances are calculated automatically.</p>
+                <p style="margin-top: 0.75rem;"><strong>3. VAT Calculator:</strong> Enter your sales and input VAT. The calculator handles the 7.5% standard rate.</p>
+                <p style="margin-top: 0.75rem;"><strong>4. Withholding Tax:</strong> Select payment type and amount. The correct WHT rate is applied automatically.</p>
+                <p style="margin-top: 0.75rem;"><strong>5. Statement Parser:</strong> Upload CSV files to categorize business expenses for tax deductions.</p>
+            </div>
+            <button class="btn btn-primary" style="margin-top: 1.5rem;" onclick="closeHelp()">Got it!</button>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal" style="display: flex;">
+        <div class="modal">
+            <h3>Welcome to calTax</h3>
+            <p>Please enter your name to continue.</p>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="loginUsername" placeholder="Enter your name">
+            </div>
+            <button class="btn btn-primary btn-full" onclick="login()">Continue</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
