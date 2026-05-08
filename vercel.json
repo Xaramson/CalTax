@@ -1,5 +1,4 @@
 {
   "buildCommand": "npm install",
-  "framework": "express",
-  "nodeVersion": "18.x"
+  "framework": "express"
 }
