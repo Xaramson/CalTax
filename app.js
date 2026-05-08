@@ -132,7 +132,6 @@ async function saveTaxCalculation(type, grossIncome, taxPayable, effectiveRate) 
             })
         });
         const data = await response.json();
-        console.log(data,'jjj');
         return data.success;
     } catch (err) {
         console.warn('Save failed:', err);
@@ -326,21 +325,108 @@ for (let i = 0; i < brackets.length; i++) {
     document.getElementById('personal-monthly-tax').textContent = formatCurrency(tax / 12);
 
     // Update breakdown
-    let breakdownHTML = '';
+    let breakdownHTML = `
+        <div class="breakdown-section">
+            <h4>Income Summary</h4>
+            <div class="breakdown-item">
+                <span class="label">Basic Salary</span>
+                <span class="value">${formatCurrency(basicSalary)}</span>
+            </div>
+            <div class="breakdown-item">
+                <span class="label">Housing Allowance</span>
+                <span class="value">${formatCurrency(housingAllowance)}</span>
+            </div>
+            <div class="breakdown-item">
+                <span class="label">Transport Allowance</span>
+                <span class="value">${formatCurrency(transportAllowance)}</span>
+            </div>
+            <div class="breakdown-item">
+                <span class="label">Other Allowances</span>
+                <span class="value">${formatCurrency(otherAllowances)}</span>
+            </div>
+            <div class="breakdown-item">
+                <span class="label">Bonus/Incentives</span>
+                <span class="value">${formatCurrency(bonus)}</span>
+            </div>
+            <div class="breakdown-item total-row">
+                <span class="label"><strong>Gross Annual Income</strong></span>
+                <span class="value"><strong>${formatCurrency(grossIncome)}</strong></span>
+            </div>
+        </div>
+        
+        <div class="breakdown-section">
+            <h4>Deductions Applied</h4>`;
+
+    if (autoDeductions) {
+        const cra = Math.max(grossIncome * 0.2, 200000);
+        const nhf = basicSalary * 0.025;
+        const nsitf = basicSalary * 0.01;
+        const pension = Math.min(basicSalary * (pensionPercent / 100), basicSalary * 0.0833);
+        
+        breakdownHTML += `
+            <div class="breakdown-item">
+                <span class="label">Consolidated Relief Allowance (20% or ₦200k min)</span>
+                <span class="value">-${formatCurrency(cra)}</span>
+            </div>
+            <div class="breakdown-item">
+                <span class="label">NHF (2.5% of basic salary)</span>
+                <span class="value">-${formatCurrency(nhf)}</span>
+            </div>
+            <div class="breakdown-item">
+                <span class="label">NSITF (1% of basic salary)</span>
+                <span class="value">-${formatCurrency(nsitf)}</span>
+            </div>
+            <div class="breakdown-item">
+                <span class="label">Pension (${pensionPercent}% of basic salary)</span>
+                <span class="value">-${formatCurrency(pension)}</span>
+            </div>`;
+    }
+
+    if (cappedLifeInsurance > 0) {
+        breakdownHTML += `
+            <div class="breakdown-item">
+                <span class="label">Life Insurance Premium (max ₦50,000)</span>
+                <span class="value">-${formatCurrency(cappedLifeInsurance)}</span>
+            </div>`;
+    }
+
+    if (cappedProfessionalSub > 0) {
+        breakdownHTML += `
+            <div class="breakdown-item">
+                <span class="label">Professional Subscription (max ₦10,000)</span>
+                <span class="value">-${formatCurrency(cappedProfessionalSub)}</span>
+            </div>`;
+    }
+
+    breakdownHTML += `
+            <div class="breakdown-item total-row">
+                <span class="label"><strong>Total Deductions</strong></span>
+                <span class="value"><strong>-${formatCurrency(totalDeductions)}</strong></span>
+            </div>
+        </div>
+        
+        <div class="breakdown-section">
+            <h4>Tax Calculation</h4>
+            <div class="breakdown-item total-row">
+                <span class="label"><strong>Taxable Income</strong></span>
+                <span class="value"><strong>${formatCurrency(taxableIncome)}</strong></span>
+            </div>`;
+
     breakdown.forEach(item => {
         breakdownHTML += `
             <div class="breakdown-item">
-                <span class="label">${item.range} (${item.rate})</span>
+                <span class="label">Tax on ${item.range} at ${item.rate}</span>
                 <span class="value">${formatCurrency(item.tax)}</span>
-            </div>
-        `;
+            </div>`;
     });
+
     breakdownHTML += `
-        <div class="breakdown-item">
-            <span class="label">Total Deductions</span>
-            <span class="value">-${formatCurrency(totalDeductions)}</span>
-        </div>
-    `;
+            <div class="breakdown-item total-row final-total">
+                <span class="label"><strong>Total Income Tax</strong></span>
+                <span class="value"><strong>${formatCurrency(tax)}</strong></span>
+            </div>
+        </div>`;
+
     document.getElementById('personal-breakdown').innerHTML = breakdownHTML;
 
     // Show results
@@ -1119,12 +1205,67 @@ function exportExpensePDF() {
 // Tax Calendar
 let currentMonth = new Date().getMonth();
 let currentYear = new Date().getFullYear();
-let taxEvents = [
-    { date: '2026-04-10', title: 'PAYE Remittance Due' },
-    { date: '2026-04-15', title: 'WHT Remittance Due' },
-    { date: '2026-04-21', title: 'VAT Filing Due' },
-    { date: '2026-03-31', title: 'Annual Returns Deadline' }
-];
+
+function getTaxEvents(year) {
+    const events = [];
+    
+    // Monthly PAYE remittances (due by 10th of following month)
+    for (let month = 0; month < 12; month++) {
+        const dueDate = new Date(year, month + 1, 10);
+        if (dueDate.getMonth() === month + 1) {
+            dueDate.setMonth(month + 1);
+            dueDate.setDate(10);
+        }
+        const dateStr = `${year}-${String(dueDate.getMonth() + 1).padStart(2, '0')}-${String(dueDate.getDate()).padStart(2, '0')}`;
+        events.push({
+            date: dateStr,
+            title: `PAYE Remittance Due (${new Date(year, month).toLocaleString('default', { month: 'short' })} income)`,
+            type: 'paye'
+        });
+    }
+    
+    // Monthly VAT filings (due by 21st of following month)
+    for (let month = 0; month < 12; month++) {
+        const dueDate = new Date(year, month + 1, 21);
+        if (dueDate.getMonth() === month + 1) {
+            dueDate.setMonth(month + 1);
+            dueDate.setDate(21);
+        }
+        const dateStr = `${year}-${String(dueDate.getMonth() + 1).padStart(2, '0')}-${String(dueDate.getDate()).padStart(2, '0')}`;
+        events.push({
+            date: dateStr,
+            title: `VAT Filing & Payment Due (${new Date(year, month).toLocaleString('default', { month: 'short' })} period)`,
+            type: 'vat'
+        });
+    }
+    
+    // Withholding Tax remittances (due by 21st of following month)
+    for (let month = 0; month < 12; month++) {
+        const dueDate = new Date(year, month + 1, 21);
+        if (dueDate.getMonth() === month + 1) {
+            dueDate.setMonth(month + 1);
+            dueDate.setDate(21);
+        }
+        const dateStr = `${year}-${String(dueDate.getMonth() + 1).padStart(2, '0')}-${String(dueDate.getDate()).padStart(2, '0')}`;
+        events.push({
+            date: dateStr,
+            title: `Withholding Tax Remittance Due (${new Date(year, month).toLocaleString('default', { month: 'short' })} period)`,
+            type: 'wht'
+        });
+    }
+    
+    // Annual tax deadlines
+    events.push(
+        { date: `${year}-03-31`, title: 'Annual Personal Income Tax Return Filing Deadline', type: 'annual' },
+        { date: `${year}-03-31`, title: 'Provisional Tax Payment Deadline (1st installment)', type: 'provisional' },
+        { date: `${year}-08-31`, title: 'Provisional Tax Payment Deadline (2nd installment)', type: 'provisional' },
+        { date: `${year}-03-31`, title: 'Company Income Tax Return Filing Deadline', type: 'annual' }
+    );
+    
+    return events;
+}
+
+let taxEvents = getTaxEvents(currentYear);
 
 function renderCalendar() {
     const grid = document.getElementById('calendarGrid');
@@ -1210,9 +1351,11 @@ function changeMonth(delta) {
     if (currentMonth > 11) {
         currentMonth = 0;
         currentYear++;
+        taxEvents = getTaxEvents(currentYear);
     } else if (currentMonth < 0) {
         currentMonth = 11;
         currentYear--;
+        taxEvents = getTaxEvents(currentYear);
     }
     renderCalendar();
 }

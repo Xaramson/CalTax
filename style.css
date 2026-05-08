@@ -487,6 +487,44 @@ body.dark .breakdown-item {
     font-weight: 500;
 }
 
+.breakdown-section {
+    margin-bottom: 2rem;
+}
+
+.breakdown-section h4 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+body.dark .breakdown-section h4 {
+    color: var(--text-primary-dark);
+}
+
+.breakdown-item.total-row {
+    background: rgba(30, 58, 79, 0.1);
+    margin: 0.5rem 0;
+    padding: 1rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+}
+
+body.dark .breakdown-item.total-row {
+    background: rgba(30, 58, 79, 0.2);
+}
+
+.breakdown-item.final-total {
+    background: var(--accent);
+    color: white;
+    font-size: 1.1rem;
+}
+
+.breakdown-item.final-total .label,
+.breakdown-item.final-total .value {
+    color: white;
+}
+
 /* Statement Parser */
 .parser-section {
     margin-top: 2rem;
