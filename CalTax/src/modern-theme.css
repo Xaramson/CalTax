@@ -312,9 +312,193 @@ body {
   color: #315d9f;
 }
 
+.dashboard-metrics .metric-card {
+  position: relative;
+  overflow: hidden;
+  border: 0;
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.14);
+}
+
+.dashboard-metrics .metric-card::after {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 48%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 110'%3E%3Cpath d='M2 80 C14 65 21 93 37 66 S58 50 68 70 S80 50 96 53 S116 34 130 44 S146 12 158 18' fill='none' stroke='white' stroke-opacity='.56' stroke-width='2'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  content: '';
+  pointer-events: none;
+}
+
+.dashboard-metrics .metric-card:nth-child(1) {
+  background: linear-gradient(120deg, #2563eb, #06a6cb);
+}
+
+.dashboard-metrics .metric-card:nth-child(2) {
+  background: linear-gradient(120deg, #3156c8, #1096b9);
+}
+
+.dashboard-metrics .metric-card:nth-child(3) {
+  background: linear-gradient(120deg, #087eae, #36a5d6);
+}
+
+.dashboard-metrics .metric-card:nth-child(4) {
+  background: linear-gradient(120deg, #344ec5, #5277e8);
+}
+
+.dashboard-metrics .metric-card:hover {
+  box-shadow: 0 12px 26px rgba(37, 99, 235, 0.24);
+}
+
+.dashboard-metrics .metric-top,
+.dashboard-metrics .metric-value,
+.dashboard-metrics .metric-bottom {
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-metrics .metric-top {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.dashboard-metrics .metric-icon {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.dashboard-metrics .metric-value {
+  color: #fff;
+}
+
+.dashboard-metrics .trend-up,
+.dashboard-metrics .trend-down,
+.dashboard-metrics .metric-note {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.metric-grid:not(.dashboard-metrics) .metric-card {
+  --metric-accent: #2563eb;
+  --metric-gradient: linear-gradient(125deg, #2563eb, #3b82f6);
+  position: relative;
+  overflow: hidden;
+  border-color: transparent;
+  background: var(--metric-gradient);
+  box-shadow: 0 7px 18px rgba(37, 99, 235, 0.17);
+}
+
+.metric-grid:not(.dashboard-metrics) .metric-card:nth-child(2) {
+  --metric-accent: #0f766e;
+  --metric-gradient: linear-gradient(125deg, #0f766e, #14b8a6);
+}
+
+.metric-grid:not(.dashboard-metrics) .metric-card:nth-child(3) {
+  --metric-accent: #6d4bd1;
+  --metric-gradient: linear-gradient(125deg, #5942bd, #8b5cf6);
+}
+
+.metric-grid:not(.dashboard-metrics) .metric-card:nth-child(4) {
+  --metric-accent: #0369a1;
+  --metric-gradient: linear-gradient(125deg, #0369a1, #38bdf8);
+}
+
+.metric-grid:not(.dashboard-metrics) .metric-card::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.8), transparent 90%);
+  content: '';
+}
+
+.metric-grid:not(.dashboard-metrics) .metric-card::after {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 42%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 110'%3E%3Cpath d='M2 80 C14 65 21 93 37 66 S58 50 68 70 S80 50 96 53 S116 34 130 44 S146 12 158 18' fill='none' stroke='white' stroke-opacity='.42' stroke-width='2'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  content: '';
+  pointer-events: none;
+}
+
+.metric-grid:not(.dashboard-metrics) .metric-top,
+.metric-grid:not(.dashboard-metrics) .metric-value,
+.metric-grid:not(.dashboard-metrics) .metric-bottom {
+  position: relative;
+  z-index: 1;
+}
+
+.metric-grid:not(.dashboard-metrics) .metric-top {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.metric-grid:not(.dashboard-metrics) .metric-icon {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.metric-grid:not(.dashboard-metrics) .metric-value {
+  color: #fff;
+}
+
+.metric-grid:not(.dashboard-metrics) .trend-up,
+.metric-grid:not(.dashboard-metrics) .trend-down {
+  color: #fff;
+}
+
+.metric-grid:not(.dashboard-metrics) .metric-note {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.metric-grid:not(.dashboard-metrics) .metric-card:hover {
+  box-shadow: 0 11px 24px rgba(30, 55, 90, 0.22);
+}
+
 .stock-badge.warning,
 .alert-stock strong {
   color: #a96832;
+}
+
+.cart-customer {
+  border-color: #d6e0ed;
+  background: #f7f9fc;
+  color: #315d9f;
+}
+
+.cart-customer select {
+  color: #334155;
+}
+
+.pos-add-customer-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 6px;
+  padding: 5px 7px;
+  background: #eaf2ff;
+  color: #1d4ed8;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.pos-add-customer-toggle:hover {
+  background: #dceaff;
+}
+
+.pos-add-customer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 7px;
+  margin: -4px 14px 12px;
+}
+
+.pos-add-customer input {
+  min-width: 0;
+  border: 1px solid #d6e0ed;
+  border-radius: 8px;
+  padding: 8px 9px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 11px;
 }
 
 button:focus-visible,
