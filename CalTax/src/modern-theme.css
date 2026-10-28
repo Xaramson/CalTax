@@ -1,0 +1,330 @@
+:root {
+  color-scheme: light;
+  color: #17243a;
+  background: #f3f6fb;
+  --ink: #17243a;
+  --muted: #64748b;
+  --line: #dce5f0;
+  --purple: #2563eb;
+  --purple-dark: #1d4ed8;
+  --purple-soft: #eaf2ff;
+  --green: #16845b;
+  --green-soft: #e8f5ee;
+  --orange: #a96832;
+  --orange-soft: #f7eee7;
+  --blue: #2563eb;
+  --blue-soft: #eaf2ff;
+  --shadow: 0 4px 16px rgba(30, 55, 90, 0.06);
+}
+
+body {
+  background: #f3f6fb;
+  color: var(--ink);
+}
+
+.app-shell,
+.main-area {
+  background: #f3f6fb;
+}
+
+.sidebar {
+  background: #10213b;
+  border-right-color: #203854;
+  color: #f8fbff;
+}
+
+.brand-mark {
+  background: #2563eb;
+  box-shadow: 0 5px 14px rgba(37, 99, 235, 0.3);
+}
+
+.brand-name,
+.brand-name span,
+.store-info strong,
+.profile-info strong {
+  color: #f8fbff;
+}
+
+.sidebar .brand-name span {
+  color: #f8fbff;
+}
+
+.brand-caption,
+.nav-label,
+.store-info span,
+.profile-info span,
+.more-dots {
+  color: #9fb2ca;
+}
+
+.store-switcher,
+.profile-button {
+  background: #172b49;
+  border-color: #294361;
+  color: #f8fbff;
+}
+
+.store-avatar,
+.profile-avatar {
+  background: #24436b;
+  color: #dceaff;
+}
+
+.nav-item {
+  color: #bdcbe0;
+}
+
+.nav-item:hover {
+  background: #1b3558;
+  color: #fff;
+}
+
+.nav-item.active {
+  background: #1d4f9a;
+  color: #fff;
+}
+
+.nav-item.active:before {
+  background: #7fb0ff;
+}
+
+.help-card {
+  border-color: #294361;
+  background: linear-gradient(145deg, #172b49, #1d3d67);
+  color: #f8fbff;
+}
+
+.help-card p {
+  color: #bdcbe0;
+}
+
+.help-icon {
+  background: #dceaff;
+  color: #1d4ed8;
+}
+
+.help-card button {
+  color: #9fc2ff;
+}
+
+.topbar {
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom-color: var(--line);
+  box-shadow: 0 2px 10px rgba(30, 55, 90, 0.035);
+}
+
+.page-content {
+  color: var(--ink);
+}
+
+.metric-card,
+.panel {
+  border-color: var(--line);
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+}
+
+.metric-card {
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(30, 55, 90, 0.1);
+}
+
+.btn {
+  border-radius: 9px;
+}
+
+.btn-primary {
+  background: #2563eb;
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.2);
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.btn-secondary {
+  border-color: #d6e0ed;
+  color: #334155;
+}
+
+.btn-secondary:hover {
+  background: #f1f6fc;
+}
+
+.global-search,
+.pos-search {
+  border-color: #d6e0ed;
+  background: #f7f9fc;
+}
+
+.global-search:focus-within,
+.pos-search:focus-within,
+.tax-currency-input:focus-within {
+  border-color: #7ba8f5;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.11);
+}
+
+.store-avatar,
+.help-icon,
+.metric-icon,
+.quick-icon,
+.product-thumb,
+.pos-product-art,
+.settings-tab,
+.mini-action,
+.category-pills button {
+  border-radius: 10px;
+}
+
+.metric-icon.green,
+.quick-icon.green,
+.product-thumb.green,
+.pos-product-art.green,
+.av-green {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.metric-icon.purple,
+.quick-icon.purple,
+.product-thumb.purple,
+.pos-product-art.purple,
+.av-purple {
+  background: var(--purple-soft);
+  color: var(--purple);
+}
+
+.metric-icon.blue,
+.quick-icon.blue,
+.product-thumb.blue,
+.pos-product-art.blue,
+.av-blue {
+  background: var(--blue-soft);
+  color: var(--blue);
+}
+
+.metric-icon.orange,
+.quick-icon.orange,
+.product-thumb.orange,
+.pos-product-art.orange,
+.av-orange {
+  background: var(--orange-soft);
+  color: var(--orange);
+}
+
+.nav-item.active,
+.btn-primary,
+.text-action,
+.help-card button,
+.brand-name span,
+.tax-tax-breakdown .tax-total strong,
+.tax-law-note a {
+  color: #2563eb;
+}
+
+.nav-item.active,
+.btn-primary,
+.help-card button {
+  color: #fff;
+}
+
+.bar-highlight,
+.legend-dot {
+  background: #2563eb;
+}
+
+.bar {
+  background: #d5e4fb;
+}
+
+.mini-action,
+.row-more:hover,
+.category-pills button.selected,
+.add-product,
+.settings-tab.active {
+  border-color: #ccdcf7;
+  background: #eaf2ff;
+  color: #1d4ed8;
+}
+
+.category-pills button.selected {
+  border-color: #a9c5f4;
+}
+
+.tax-disclaimer,
+.tax-law-note {
+  border-color: #d6e0ed;
+  background: #f1f6fc;
+}
+
+.tax-disclaimer > svg,
+.tax-law-note > svg,
+.tax-section-kicker {
+  color: #315d9f;
+}
+
+.tax-disclaimer strong,
+.tax-reminder h2 {
+  color: #17243a;
+}
+
+.tax-reminder {
+  border-color: #d3e6dc;
+  background: #eff7f2;
+}
+
+.tax-reminder.due-soon {
+  border-color: #e7d8c8;
+  background: #f8f2ed;
+}
+
+.tax-reminder.overdue {
+  border-color: #edd2d0;
+  background: #fbf1f0;
+}
+
+.tax-reminder-icon {
+  background: #d9ecdf;
+  color: #16845b;
+}
+
+.tax-reminder.due-soon .tax-reminder-icon {
+  background: #efe0d2;
+  color: #a96832;
+}
+
+.tax-reminder.overdue .tax-reminder-icon,
+.camera-error {
+  color: #b33c35;
+}
+
+.tax-tax-breakdown .tax-total strong,
+.tax-law-note a {
+  color: #1d4ed8;
+}
+
+.tax-inline-note {
+  background: #eaf2ff;
+  color: #315d9f;
+}
+
+.stock-badge.warning,
+.alert-stock strong {
+  color: #a96832;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline-color: #7ba8f5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .metric-card {
+    transition: none;
+  }
+}
